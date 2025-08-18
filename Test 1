@@ -1,0 +1,352 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlitzerMail Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'calm-blue': '#E3F2FD',
+                        'focus-blue': '#64B5F6',
+                        'urgent-yellow': '#FFF9C4',
+                        'action-teal': '#4DB6AC',
+                        'backlog-gray': '#F5F5F5'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .blur-bg {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .email-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .priority-badge {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .email-card:hover .priority-badge {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .snooze-btn:hover i {
+            transform: rotate(15deg);
+        }
+        
+        .backlog-item {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .progress-gradient {
+            background: linear-gradient(90deg, #64B5F6 0%, #4DB6AC 100%);
+        }
+        
+        .check-circle {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 0.6s linear forwards;
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-700">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header Panel -->
+        <div class="blur-bg rounded-2xl p-6 mb-8 card">
+            <div class="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-gradient-to-br from-focus-blue to-action-teal rounded-xl w-14 h-14 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-semibold text-gray-800">BlitzerMail</h1>
+                        <p class="text-gray-500">Your calm email control panel</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="bg-calm-blue rounded-xl p-2">
+                        <span class="text-xl text-focus-blue">12</span>
+                        <span class="text-gray-500 ml-1">Unread</span>
+                    </div>
+                    <div class="bg-action-teal/10 rounded-xl p-2">
+                        <span class="text-xl text-action-teal">86%</span>
+                        <span class="text-gray-500 ml-1">Clarity</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <div class="flex justify-between mb-3">
+                    <span class="text-sm font-medium text-gray-600">Priority Focus Level</span>
+                    <span class="text-sm text-focus-blue font-medium">Optimal</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5">
+                    <div class="progress-gradient h-2.5 rounded-full w-4/5"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Priority Now Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">Priority Now</h2>
+                <div class="flex space-x-2">
+                    <button class="text-sm px-3 py-1 bg-calm-blue text-focus-blue rounded-full flex items-center">
+                        <i class="fas fa-plus mr-2 text-xs"></i> New
+                    </button>
+                    <button class="bg-white rounded-lg p-2 card">
+                        <i class="fas fa-cog text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Priority Email Cards -->
+                <div class="email-card card bg-white rounded-xl p-5 relative slide-in" style="animation-delay: 0.1s">
+                    <div class="priority-badge bg-urgent-yellow text-yellow-700 px-3 py-1 rounded-full text-xs font-medium">
+                        High Priority
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-gradient-to-br from-focus-blue/20 to-action-teal/20 rounded-xl w-10 h-10 flex items-center justify-center mr-3">
+                            <span class="text-focus-blue font-medium">JD</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-medium text-gray-800">Project Deadline Extension</h3>
+                                <span class="text-xs text-gray-400 mt-1">2h ago</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 truncate">Can we discuss extending the deadline for the Q3 deliverables?</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 mt-4">
+                        <button class="snooze-btn flex-1 bg-backlog-gray text-gray-600 py-2 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-clock mr-2"></i> Snooze
+                        </button>
+                        <button class="flex-1 bg-focus-blue text-white py-2 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-reply mr-2"></i> Reply
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="email-card card bg-white rounded-xl p-5 relative slide-in" style="animation-delay: 0.2s">
+                    <div class="priority-badge bg-urgent-yellow text-yellow-700 px-3 py-1 rounded-full text-xs font-medium">
+                        Action Required
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-gradient-to-br from-amber-200/20 to-amber-400/20 rounded-xl w-10 h-10 flex items-center justify-center mr-3">
+                            <span class="text-amber-600 font-medium">HR</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-medium text-gray-800">Benefits Enrollment</h3>
+                                <span class="text-xs text-gray-400 mt-1">1d ago</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 truncate">Reminder: Complete your benefits enrollment by Friday</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 mt-4">
+                        <button class="snooze-btn flex-1 bg-backlog-gray text-gray-600 py-2 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-clock mr-2"></i> Snooze
+                        </button>
+                        <button class="flex-1 bg-focus-blue text-white py-2 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-reply mr-2"></i> Reply
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Follow-up Soon -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-700">Follow-up Soon</h2>
+                <p class="text-sm text-gray-500">3 needing attention</p>
+            </div>
+            
+            <div class="bg-white rounded-xl card overflow-hidden">
+                <div class="border-b border-gray-100 last:border-0">
+                    <div class="p-4 flex items-start">
+                        <div class="bg-backlog-gray rounded-lg w-8 h-8 flex items-center justify-center mr-3">
+                            <span class="text-gray-500 text-sm">TS</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-700">Meeting notes from today</h3>
+                            <p class="text-sm text-gray-500 mt-1">Attached are the notes from our product meeting...</p>
+                        </div>
+                        <div class="text-xs text-amber-500">Today</div>
+                    </div>
+                </div>
+                
+                <div class="border-b border-gray-100 last:border-0">
+                    <div class="p-4 flex items-start">
+                        <div class="bg-backlog-gray rounded-lg w-8 h-8 flex items-center justify-center mr-3">
+                            <span class="text-gray-500 text-sm">KR</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-700">Lunch plans next week</h3>
+                            <p class="text-sm text-gray-500 mt-1">Let me know when works for you next week...</p>
+                        </div>
+                        <div class="text-xs text-gray-400">Mon</div>
+                    </div>
+                </div>
+                
+                <div class="last:border-0">
+                    <div class="p-4 flex items-start">
+                        <div class="bg-backlog-gray rounded-lg w-8 h-8 flex items-center justify-center mr-3">
+                            <span class="text-gray-500 text-sm">PM</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-700">Conference feedback</h3>
+                            <p class="text-sm text-gray-500 mt-1">Would love your thoughts on the keynote last week...</p>
+                        </div>
+                        <div class="text-xs text-gray-400">Tue</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Backlog Indicator -->
+        <div class="bg-backlog-gray rounded-xl card p-5 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-inbox text-gray-500"></i>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-700">Low Priority Backlog</h3>
+                    <p class="text-sm text-gray-500">68 emails faded back</p>
+                </div>
+            </div>
+            <button class="text-action-teal font-medium">Review Weekly</button>
+        </div>
+        
+        <!-- Stats Visualization -->
+        <div class="mt-8 bg-white rounded-xl card p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-gray-800">Priority Distribution</h3>
+                <span class="text-xs bg-calm-blue text-focus-blue px-2 py-1 rounded-full">Updated today</span>
+            </div>
+            <div class="flex items-end justify-around h-40">
+                <div class="flex flex-col items-center">
+                    <div class="w-6 bg-focus-blue rounded-t-full" style="height: 120px;"></div>
+                    <span class="text-xs mt-2 text-gray-500">Priority</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-6 bg-amber-300 rounded-t-full" style="height: 90px;"></div>
+                    <span class="text-xs mt-2 text-gray-500">Follow-up</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-6 bg-backlog-gray rounded-t-full" style="height: 40px;"></div>
+                    <span class="text-xs mt-2 text-gray-500">Backlog</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-6 bg-action-teal rounded-t-full" style="height: 75px;"></div>
+                    <span class="text-xs mt-2 text-gray-500">Completed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle animation classes on load
+        document.querySelectorAll('.slide-in').forEach((el, i) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, 150 * (i + 1));
+        });
+        
+        // Email action handlers
+        document.querySelectorAll('.snooze-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.email-card');
+                card.style.transform = 'translateY(10px)';
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                    // In real app, would move to snoozed state
+                }, 300);
+            });
+        });
+        
+        // Show confirmation on action
+        document.querySelectorAll('.email-card').forEach(card => {
+            const replyBtn = card.querySelector('button.bg-focus-blue');
+            replyBtn.addEventListener('click', function() {
+                const iconContainer = document.createElement('div');
+                iconContainer.innerHTML = `
+                    <svg width="40" height="40" viewBox="0 0 24 24" class="text-action-teal">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path class="check-circle" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 13l4 4 8-8"/>
+                    </svg>
+                `;
+                
+                const originalHtml = card.innerHTML;
+                card.innerHTML = '';
+                card.classList.add('flex', 'items-center', 'justify-center', 'py-8');
+                card.appendChild(iconContainer);
+                
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
