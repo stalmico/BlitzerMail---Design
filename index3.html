@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BlitzerMail - Voice-powered AI for your inbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+        
+        .ios-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            gap: 3px;
+        }
+        
+        .voice-bar {
+            width: 4px;
+            background: #667eea;
+            border-radius: 2px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+        
+        .voice-bar:nth-child(2) { animation-delay: 0.1s; height: 30px; }
+        .voice-bar:nth-child(3) { animation-delay: 0.2s; height: 40px; }
+        .voice-bar:nth-child(4) { animation-delay: 0.3s; height: 50px; }
+        .voice-bar:nth-child(5) { animation-delay: 0.4s; height: 35px; }
+        .voice-bar:nth-child(6) { animation-delay: 0.5s; height: 45px; }
+        .voice-bar:nth-child(7) { animation-delay: 0.6s; height: 25px; }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+        
+        .email-card {
+            transition: all 0.3s ease;
+        }
+        
+        .email-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e5e7;
+            padding: 8px 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .briefing-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .voice-button {
+            transition: all 0.3s ease;
+        }
+        
+        .voice-button:active {
+            transform: scale(0.95);
+        }
+        
+        .voice-button.recording {
+            background: #ff3b30;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .priority-badge {
+            background: #ff9500;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .siri-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            gap: 3px;
+        }
+        
+        .siri-bar {
+            width: 3px;
+            background: #1d1d1f;
+            border-radius: 3px;
+            animation: siriWave 1.5s ease-in-out infinite;
+        }
+        
+        .siri-bar:nth-child(1) { animation-delay: 0s; height: 15px; }
+        .siri-bar:nth-child(2) { animation-delay: 0.1s; height: 25px; }
+        .siri-bar:nth-child(3) { animation-delay: 0.2s; height: 35px; }
+        .siri-bar:nth-child(4) { animation-delay: 0.3s; height: 20px; }
+        .siri-bar:nth-child(5) { animation-delay: 0.4s; height: 30px; }
+        .siri-bar:nth-child(6) { animation-delay: 0.5s; height: 15px; }
+        .siri-bar:nth-child(7) { animation-delay: 0.6s; height: 25px; }
+        .siri-bar:nth-child(8) { animation-delay: 0.7s; height: 20px; }
+        
+        @keyframes siriWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.3); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen pb-20">
+        <!-- Header -->
+        <header class="glass-effect sticky top-0 z-50 px-5 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent ios-gradient">BlitzerMail</h1>
+                <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">AI</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 transition">
+                    <i class="fas fa-search text-gray-600"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-gray-100 transition">
+                    <i class="fas fa-bell text-gray-600"></i>
+                </button>
+                <img src="https://picsum.photos/seed/user123/40/40.jpg" alt="Profile" class="w-8 h-8 rounded-full">
+            </div>
+        </header>
+        
+        <!-- Voice Interface -->
+        <section class="px-5 py-6">
+            <div class="bg-white rounded-3xl shadow-lg p-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-semibold mb-2">Good morning, Alex</h2>
+                    <p class="text-gray-500">What would you like to do with your emails?</p>
+                </div>
+                
+                <div class="flex justify-center mb-6">
+                    <button id="voiceButton" class="voice-button w-24 h-24 rounded-full ios-gradient flex items-center justify-center shadow-lg">
+                        <i class="fas fa-microphone text-white text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div id="voiceWave" class="voice-wave hidden mb-6">
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                </div>
+                
+                <div id="voiceResponse" class="bg-gray-50 rounded-2xl p-4 hidden">
+                    <div class="siri-wave mb-3">
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                        <div class="siri-bar"></div>
+                    </div>
+                    <p class="text-gray-700">"Reply to Sarah's meeting request with a polite decline and suggest next week instead."</p>
+                </div>
+                
+                <div class="flex justify-around mt-6">
+                    <button class="flex flex-col items-center text-gray-600 hover:text-purple-600 transition">
+                        <i class="fas fa-inbox text-xl mb-1"></i>
+                        <span class="text-xs">Inbox</span>
+                    </button>
+                    <button class="flex flex-col items-center text-gray-600 hover:text-purple-600 transition">
+                        <i class="fas fa-star text-xl mb-1"></i>
+                        <span class="text-xs">Starred</span>
+                    </button>
+                    <button class="flex flex-col items-center text-gray-600 hover:text-purple-600 transition">
+                        <i class="fas fa-paper-plane text-xl mb-1"></i>
+                        <span class="text-xs">Sent</span>
+                    </button>
+                    <button class="flex flex-col items-center text-gray-600 hover:text-purple-600 transition">
+                        <i class="fas fa-archive text-xl mb-1"></i>
+                        <span class="text-xs">Archive</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Daily Briefing -->
+        <section class="px-5 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Daily Briefing</h3>
+                <button class="text-purple-600 text-sm font-medium">View All</button>
+            </div>
+            
+            <div class="briefing-card rounded-2xl p-4 mb-4 slide-up">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <h4 class="font-semibold">Your Top Priority Today</h4>
+                        <p class="text-sm text-gray-600">Project deadline approaching</p>
+                    </div>
+                    <span class="priority-badge">HIGH</span>
+                </div>
+                <p class="text-sm mt-2">3 emails require your immediate attention. Review the attached documents and provide feedback by 5 PM.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white rounded-xl p-3 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-calendar text-blue-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">Meetings</p>
+                            <p class="text-xs text-gray-500">Today</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600">2 meetings scheduled</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-3 shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-user-check text-green-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">Follow-ups</p>
+                            <p class="text-xs text-gray-500">Pending</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600">5 items to reply</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Important Emails -->
+        <section class="px-5 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">12 Emails That Matter</h3>
+                <div class="flex items-center text-sm text-gray-500">
+                    <i class="fas fa-filter mr-1"></i>
+                    <span>Filter</span>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <!-- Email 1 -->
+                <div class="email-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start">
+                        <img src="https://picsum.photos/seed/sarah456/40/40.jpg" alt="Sender" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold">Sarah Johnson</h4>
+                                    <p class="text-sm text-gray-500">Project Update & Next Steps</p>
+                                </div>
+                                <span class="text-xs text-gray-400">9:42 AM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Hi Alex, I've completed the initial design mockups for the new dashboard. Please review when you have a moment...</p>
+                            <div class="flex items-center mt-3 space-x-3">
+                                <button class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-200 transition">
+                                    <i class="fas fa-microphone mr-1"></i> Voice Reply
+                                </button>
+                                <button class="text-xs text-gray-500 hover:text-gray-700 transition">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email 2 -->
+                <div class="email-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start">
+                        <img src="https://picsum.photos/seed/mike789/40/40.jpg" alt="Sender" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold">Mike Chen</h4>
+                                    <p class="text-sm text-gray-500">Meeting Reschedule Request</p>
+                                </div>
+                                <span class="text-xs text-gray-400">Yesterday</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Would it be possible to move our meeting from Thursday to Friday? I have a conflicting appointment...</p>
+                            <div class="flex items-center mt-3 space-x-3">
+                                <button class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-200 transition">
+                                    <i class="fas fa-microphone mr-1"></i> Voice Reply
+                                </button>
+                                <button class="text-xs text-gray-500 hover:text-gray-700 transition">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email 3 -->
+                <div class="email-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-building text-red-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold">TechCorp Inc.</h4>
+                                    <p class="text-sm text-gray-500">Security Update Notice</p>
+                                </div>
+                                <span class="text-xs text-gray-400">2 days ago</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">We've detected unusual activity on your account. Please verify your identity and update your password immediately...</p>
+                            <div class="flex items-center mt-3 space-x-3">
+                                <button class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-200 transition">
+                                    <i class="fas fa-microphone mr-1"></i> Voice Reply
+                                </button>
+                                <button class="text-xs text-gray-500 hover:text-gray-700 transition">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email 4 -->
+                <div class="email-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start">
+                        <img src="https://picsum.photos/seed/emma321/40/40.jpg" alt="Sender" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold">Emma Rodriguez</h4>
+                                    <p class="text-sm text-gray-500">Lunch Next Week?</p>
+                                </div>
+                                <span class="text-xs text-gray-400">3 days ago</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">Hi Alex! It's been a while since we caught up. Are you free for lunch sometime next week? I'd love to hear about...</p>
+                            <div class="flex items-center mt-3 space-x-3">
+                                <button class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-200 transition">
+                                    <i class="fas fa-microphone mr-1"></i> Voice Reply
+                                </button>
+                                <button class="text-xs text-gray-500 hover:text-gray-700 transition">
+                                    <i class="fas fa-star"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="flex justify-around">
+            <button class="nav-item active flex flex-col items-center py-2 px-4">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Home</span>
+            </button>
+            <button class="nav-item flex flex-col items-center py-2 px-4 text-gray-500">
+                <i class="fas fa-compass text-xl mb-1"></i>
+                <span class="text-xs">Discover</span>
+            </button>
+            <button class="nav-item flex flex-col items-center py-2 px-4 text-gray-500">
+                <i class="fas fa-plus-circle text-xl mb-1"></i>
+                <span class="text-xs">Compose</span>
+            </button>
+            <button class="nav-item flex flex-col items-center py-2 px-4 text-gray-500">
+                <i class="fas fa-chart-line text-xl mb-1"></i>
+                <span class="text-xs">Analytics</span>
+            </button>
+            <button class="nav-item flex flex-col items-center py-2 px-4 text-gray-500">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Profile</span>
+            </button>
+        </div>
+    </nav>
+    
+    <script>
+        // Voice button functionality
+        const voiceButton = document.getElementById('voiceButton');
+        const voiceWave = document.getElementById('voiceWave');
+        const voiceResponse = document.getElementById('voiceResponse');
+        let isRecording = false;
+        
+        voiceButton.addEventListener('click', function() {
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                voiceButton.classList.add('recording');
+                voiceButton.innerHTML = '<i class="fas fa-stop text-white text-2xl"></i>';
+                voiceWave.classList.remove('hidden');
+                voiceResponse.classList.add('hidden');
+                
+                // Simulate recording for 3 seconds
+                setTimeout(() => {
+                    if (isRecording) {
+                        voiceButton.classList.remove('recording');
+                        voiceButton.innerHTML = '<i class="fas fa-microphone text-white text-2xl"></i>';
+                        voiceWave.classList.add('hidden');
+                        voiceResponse.classList.remove('hidden');
+                        
+                        // Hide response after 5 seconds
+                        setTimeout(() => {
+                            voiceResponse.classList.add('hidden');
+                        }, 5000);
+                    }
+                }, 3000);
+            } else {
+                voiceButton.classList.remove('recording');
+                voiceButton.innerHTML = '<i class="fas fa-microphone text-white text-2xl"></i>';
+                voiceWave.classList.add('hidden');
+                voiceResponse.classList.remove('hidden');
+                
+                // Hide response after 5 seconds
+                setTimeout(() => {
+                    voiceResponse.classList.add('hidden');
+                }, 5000);
+            }
+        });
+        
+        // Add slide-up animation to email cards on scroll
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('slide-up');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.email-card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Navigation item interactions
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                    nav.classList.add('text-gray-500');
+                });
+                this.classList.add('active');
+                this.classList.remove('text-gray-500');
+            });
+        });
+        
+        // Voice reply button interactions
+        document.querySelectorAll('.bg-purple-100').forEach(button => {
+            button.addEventListener('click', function() {
+                // Simulate opening voice reply
+                const emailCard = this.closest('.email-card');
+                emailCard.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    emailCard.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Show a temporary message
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check mr-1"></i> Recording...';
+                this.classList.add('bg-green-100', 'text-green-700');
+                this.classList.remove('bg-purple-100', 'text-purple-700');
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.classList.remove('bg-green-100', 'text-green-700');
+                    this.classList.add('bg-purple-100', 'text-purple-700');
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
