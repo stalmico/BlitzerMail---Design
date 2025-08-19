@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlitzerMail - Voice-powered AI for your inbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ios-blue': '#007AFF',
+                        'ios-gray': '#F2F2F7',
+                        'ios-dark': '#1C1C1E',
+                        'ios-secondary': '#8E8E93'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .email-card {
+            transition: all 0.2s ease;
+        }
+        
+        .email-card:active {
+            transform: scale(0.98);
+        }
+        
+        .voice-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .voice-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .floating-action {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 50;
+        }
+        
+        .tab-bar {
+            background: rgba(248, 248, 248, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .priority-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .ai-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Status Bar -->
+    <div class="flex justify-between items-center px-6 pt-3 pb-2 text-sm font-medium">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <div class="w-4 h-2 bg-black rounded-sm"></div>
+            <div class="w-6 h-3 border border-black rounded-sm">
+                <div class="w-4 h-1.5 bg-green-500 rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-6 py-4">
+        <div class="flex items-center justify-between mb-2">
+            <h1 class="text-3xl font-bold text-black">BlitzerMail</h1>
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+        </div>
+        <p class="text-ios-secondary text-base">Your daily briefing is ready</p>
+    </div>
+
+    <!-- Daily Summary Card -->
+    <div class="px-6 mb-6">
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Today's Briefing</h3>
+                        <p class="text-sm text-gray-600">12 important emails</p>
+                    </div>
+                </div>
+                <button class="voice-button w-12 h-12 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M5 12a7 7 0 1014 0"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>3 urgent</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>5 work</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>4 personal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email List -->
+    <div class="px-6 space-y-3 pb-32">
+        <!-- Email 1 -->
+        <div class="email-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-red-600 font-semibold text-sm">JS</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-semibold text-gray-900 truncate">John Smith</h4>
+                        <div class="flex items-center space-x-2">
+                            <span class="priority-badge text-white text-xs px-2 py-1 rounded-full">Urgent</span>
+                            <span class="text-xs text-gray-500">2m</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2 line-clamp-2">Project deadline moved to tomorrow. Need your review on the final presentation slides...</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Work • Project Alpha</span>
+                        <button class="text-ios-blue text-sm font-medium">Reply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email 2 -->
+        <div class="email-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-blue-600 font-semibold text-sm">MK</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-semibold text-gray-900 truncate">Marketing Team</h4>
+                        <div class="flex items-center space-x-2">
+                            <span class="ai-badge text-white text-xs px-2 py-1 rounded-full">AI Summary</span>
+                            <span class="text-xs text-gray-500">15m</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2 line-clamp-2">Weekly campaign performance report. CTR increased by 23% this week...</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Work • Marketing</span>
+                        <button class="text-ios-blue text-sm font-medium">Reply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email 3 -->
+        <div class="email-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-green-600 font-semibold text-sm">AM</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-semibold text-gray-900 truncate">Amazon</h4>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500">1h</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2 line-clamp-2">Your package has been delivered to your front door...</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Personal • Shopping</span>
+                        <button class="text-ios-blue text-sm font-medium">Archive</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email 4 -->
+        <div class="email-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-purple-600 font-semibold text-sm">SL</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 class="font-semibold text-gray-900 truncate">Sarah Lee</h4>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500">3h</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2 line-clamp-2">Thanks for the coffee meeting! Here are the notes we discussed...</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Work • Meetings</span>
+                        <button class="text-ios-blue text-sm font-medium">Reply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More emails indicator -->
+        <div class="text-center py-4">
+            <button class="text-ios-blue font-medium">View 8 more emails</button>
+        </div>
+    </div>
+
+    <!-- Floating Voice Button -->
+    <div class="floating-action">
+        <button id="voiceButton" class="voice-button w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
+            <svg id="micIcon" class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="fixed bottom-0 left-0 right-0 tab-bar border-t border-gray-200">
+        <div class="flex items-center justify-around py-2">
+            <button class="flex flex-col items-center py-2 px-4">
+                <svg class="w-6 h-6 text-ios-blue mb-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="text-xs text-ios-blue font-medium">Inbox</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4">
+                <svg class="w-6 h-6 text-ios-secondary mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                </svg>
+                <span class="text-xs text-ios-secondary">Voice</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4">
+                <svg class="w-6 h-6 text-ios-secondary mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span class="text-xs text-ios-secondary">Smart</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4">
+                <svg class="w-6 h-6 text-ios-secondary mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-xs text-ios-secondary">Settings</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Voice button interaction
+        const voiceButton = document.getElementById('voiceButton');
+        const micIcon = document.getElementById('micIcon');
+        let isListening = false;
+
+        voiceButton.addEventListener('click', function() {
+            if (!isListening) {
+                // Start listening
+                isListening = true;
+                voiceButton.classList.add('pulse-animation');
+                micIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                `;
+                
+                // Simulate listening for 3 seconds
+                setTimeout(() => {
+                    isListening = false;
+                    voiceButton.classList.remove('pulse-animation');
+                    micIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    `;
+                }, 3000);
+            }
+        });
+
+        // Email card interactions
+        const emailCards = document.querySelectorAll('.email-card');
+        emailCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Add slide-up animation to simulate opening email
+                this.classList.add('slide-up');
+            });
+        });
+
+        // Tab bar interactions
+        const tabButtons = document.querySelectorAll('.tab-bar button');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active state from all buttons
+                tabButtons.forEach(btn => {
+                    const icon = btn.querySelector('svg');
+                    const text = btn.querySelector('span');
+                    icon.classList.remove('text-ios-blue');
+                    icon.classList.add('text-ios-secondary');
+                    text.classList.remove('text-ios-blue', 'font-medium');
+                    text.classList.add('text-ios-secondary');
+                });
+                
+                // Add active state to clicked button
+                const icon = this.querySelector('svg');
+                const text = this.querySelector('span');
+                icon.classList.remove('text-ios-secondary');
+                icon.classList.add('text-ios-blue');
+                text.classList.remove('text-ios-secondary');
+                text.classList.add('text-ios-blue', 'font-medium');
+            });
+        });
+
+        // Smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
